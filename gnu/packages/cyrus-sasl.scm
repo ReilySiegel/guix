@@ -4,6 +4,7 @@
 ;;; Copyright © 2016 Leo Famulari <leo@famulari.name>
 ;;; Copyright © 2019 Mathieu Othacehe <m.othacehe@gmail.com>
 ;;; Copyright © 2022 Marius Bakke <marius@gnu.org>
+;;; Copyright © 2022 Morgan Smith <Morgan.J.Smith@outlook.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -30,6 +31,7 @@
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix download)
+  #:use-module (guix git-download)
   #:use-module (guix build-system gnu))
 
 (define-public cyrus-sasl
@@ -76,3 +78,35 @@ server writers.")
     (license (license:non-copyleft "file://COPYING"
                                    "See COPYING in the distribution."))
     (home-page "https://cyrusimap.org/sasl/")))
+
+(define-public cyrus-sasl-xoauth2
+  (package
+    (name "cyrus-sasl-xoauth2")
+    (version "0.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/moriyoshi/cyrus-sasl-xoauth2")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1py9f1mn5k5xihrk0lfrwr6723c22gjb7lmgya83ibvislm2x3wl"))))
+    (build-system gnu-build-system)
+    (arguments
+     (list #:configure-flags #~(list (string-append "--with-cyrus-sasl="
+                                                    #$output)
+                                     "--disable-static")
+           #:phases #~(modify-phases %standard-phases
+                        (add-after 'unpack 'fix-autogen
+                          (lambda _
+                            (substitute* "autogen.sh"
+                              ;; Add shebang to autogen.sh
+                              (("libtoolize") "#!/bin/sh\nlibtoolize")))))))
+    (inputs (list cyrus-sasl))
+    (native-inputs (list autoconf automake libtool))
+    (home-page "https://github.com/moriyoshi/cyrus-sasl-xoauth2")
+    (synopsis "XOAUTH2 plugin for Cyrus SASL")
+    (description "Adds support for XOAUTH2 authentication to Cyrus SASL.  This
+package can be used with isync to fetch mail from servers that support it.")
+    (license license:expat)))
