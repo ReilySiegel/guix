@@ -106,4 +106,7 @@
    "7238 7123 8EAC EB63 4548  5857 167F 8EA5 001A FA9C"
    (name "wigust"))
   ("705A 29B7 01EE 410E B6F9  236E 92F1 D22C 608E E7E5"
-   (name "zimoun"))))
+   (name "zimoun"))
+  (;; primary: "E6CB 96E1 F7D6 7253 976F  9B43 7C69 B123 B3FF 5196"
+   "0FA2 FE4C 164F 60C6 7F6B  EA7E 508A 5AD0 A50F 88AF"
+   (name "reily"))))
